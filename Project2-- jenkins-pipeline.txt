@@ -1,0 +1,56 @@
+Jenkins installation steps on ubuntu-----
+
+1- sudo apt update
+2- wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+3- sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+4- sudo apt update
+5- sudo apt install Jenkins
+6- sudo systemctl enable Jenkins --now
+------------------
+Docker installation steps--
+
+1- sudo apt-get install docker.io
+2- sudo systemctl enable docker --now
+3- usermode -aG docker jenkins
+-------------------
+Dockerfile--
+
+FROM openjdk:8
+EXPOSE 8080
+ADD target/devops-integration.jar devops-integration.jar
+ENTRYPOINT ["java","-jar","/devops-integration.jar"]
+
+------------------
+Jenkins pipeline----
+pipeline {
+    agent any
+    tools{
+        maven 'maven_3_5_0'
+    }
+    stages{
+        stage('Build Maven'){
+            steps{
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Java-Techie-jt/devops-automation']]])
+                sh 'mvn clean install'
+            }
+        }
+        stage('Build docker image'){
+            steps{
+                script{
+                    sh 'docker build -t <rep_name>/<image_name> .'
+                }
+            }
+        }
+        stage('Push image to Hub'){
+            steps{
+                script{
+                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                   sh 'docker login -u <user_name> -p ${dockerhubpwd}'
+
+}
+                   sh 'docker push <rep_name>/<image_name>'
+                }
+            }
+        }
+    }
+}
