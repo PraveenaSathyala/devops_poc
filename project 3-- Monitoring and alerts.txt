@@ -1,0 +1,50 @@
+Step 1: Set Up Google Cloud Monitoring
+1. Enable Monitoring
+Enable the Monitoring API:
+Go to the API Library in the Google Cloud Console.
+Search for "Monitoring API" and enable it.
+2. Install the Monitoring Agent
+1-- SSH into your VM instance:
+
+2---Use the Google Cloud Console or your preferred method to SSH into your VM.
+    Install the Cloud Monitoring agent:
+
+3---Run the following commands based on your OS:
+For Debian/Ubuntu:
+
+1-Copy code
+2-curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+3-sudo bash add-monitoring-agent-repo.sh
+4-sudo apt-get update
+5-sudo apt-get install stackdriver-agent
+6-sudo service stackdriver-agent start
+
+4. Configure the Monitoring Agent
+  Edit the agent configuration:
+  The configuration file is located at /etc/stackdriver/stackdriver-agent.conf.
+  Edit this file to include any custom metrics or adjustments.
+5. Restart the Agent
+sudo service stackdriver-agent restart
+Step 2: Create Monitoring Dashboards
+1. Go to Google Cloud Console
+Navigate to Monitoring.
+2. Create a Dashboard
+Add a new dashboard:
+Click on Dashboards and then Create Dashboard.
+Add charts for CPU, memory, and disk usage.
+Step 3: Set Up Alerts
+1. Create an Alerting Policy
+Navigate to Monitoring -> Alerting -> Create Policy.
+2. Configure Conditions
+Add condition:
+For CPU usage:
+Select Metric.
+In Find resource type and metric, select VM Instance and CPU usage.
+Set the threshold to 80%.
+Repeat for memory and disk usage.
+3. Set Notification Channels
+  Create a notification channel:
+  Navigate to Alerting -> Notification channels.
+  Add a new email notification channel and enter the email address.
+4. Apply Notification Channel to Policy
+In the alerting policy creation screen, add the email notification channel.
